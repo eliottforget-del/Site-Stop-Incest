@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La classe — Stop Inceste (prototype)</title>
+  <meta name="description" content="Prototype de scène interactive : une salle de classe pour rendre visible une proportion issue d'une enquête de l'Ined.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#etape-2">Aller directement à la statistique</a>
+
+  <header class="topbar">
+    <p class="topbar__brand">Stop Inceste</p>
+    <p class="topbar__tag">Prototype — scène « La classe »</p>
+  </header>
+
+  <main id="contenu">
+    <section class="story" aria-label="La classe">
+      <div class="story__graphic">
+        <figure class="scene" id="scene" data-state="1">
+          <div class="scene__canvas" id="scene-canvas">
+            <div class="scene__svg" id="classroom"></div>
+            <!-- Commande superposée à la place mise en évidence (créée par main.js) -->
+          </div>
+          <figcaption class="scene__legend" id="scene-legend">
+            <span class="legend__item"><span class="legend__swatch" aria-hidden="true"></span><span id="legend-total">22 places</span></span>
+            <span class="legend__item legend__item--accent"><span class="legend__swatch legend__swatch--accent" aria-hidden="true"></span>1 place mise en évidence</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="story__steps">
+        <article class="step" id="etape-1" data-step="1" aria-labelledby="titre">
+          <div class="step__card">
+            <p class="step__kicker">1 / 3</p>
+            <h1 id="titre" class="step__title">Imaginez une classe.</h1>
+            <p class="step__lead">Vingt-deux places, vingt-deux silhouettes. Une salle ordinaire, comme il en existe dans toutes les écoles.</p>
+            <p>Cette salle va servir d’échelle pour rendre visible une proportion mesurée par une enquête.</p>
+          </div>
+        </article>
+
+        <article class="step" id="etape-2" data-step="2" aria-labelledby="etape-2-titre" tabindex="-1">
+          <div class="step__card">
+            <p class="step__kicker">2 / 3</p>
+            <h2 id="etape-2-titre" class="visually-hidden">Ce que dit l’enquête</h2>
+            <p class="step__stat reveal" style="--reveal-delay: 450ms" id="stat-phrase">Dans une enquête menée auprès d’adultes en France métropolitaine, <strong>4,6 % des femmes interrogées</strong> déclarent avoir subi des violences incestueuses avant l’âge de 18 ans.</p>
+            <p class="step__proportion reveal" style="--reveal-delay: 950ms" id="stat-proportion">Cela correspond à environ <strong>1 femme interrogée sur 22</strong>.</p>
+            <p class="step__source reveal" style="--reveal-delay: 1250ms">
+              Source :
+              <a id="source-link" href="https://www.ined.fr/fr/publications/editions/population-et-societes/violences-sexuelles-durant-enfance-et-adolescence" target="_blank" rel="noopener">Ined, <cite>Population &amp; Sociétés</cite> n° 612, juin 2023<span class="visually-hidden"> (s’ouvre dans un nouvel onglet)</span></a>
+            </p>
+            <p class="step__note reveal" style="--reveal-delay: 1450ms">Cette salle est une représentation visuelle de cette proportion. Elle ne compte pas des enfants actuellement victimes, et la place colorée a été choisie arbitrairement : elle ne désigne personne.</p>
+          </div>
+        </article>
+
+        <article class="step" id="etape-3" data-step="3" aria-labelledby="etape-3-titre">
+          <div class="step__card">
+            <p class="step__kicker">3 / 3</p>
+            <h2 id="etape-3-titre" class="step__subtitle">Comprendre ce chiffre</h2>
+            <p>Touchez ou cliquez la place mise en évidence pour savoir ce que mesure ce chiffre, à qui il se rapporte et comment le lire.</p>
+            <p>
+              <button type="button" class="btn btn--primary" id="open-panel" aria-haspopup="dialog" aria-controls="panel">Comprendre ce chiffre</button>
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="about" aria-labelledby="about-titre">
+      <h2 id="about-titre">À propos de cette scène</h2>
+      <p>Cette page est un prototype. La salle de classe illustre une proportion (environ 1 sur 22) issue d’une enquête auprès d’adultes. Chaque place est une unité de mesure et ne représente aucune personne réelle.</p>
+      <p>Source : Elise Marsicano, Nathalie Bajos, Jeanna-Eve Pousson, « Violences sexuelles durant l’enfance et l’adolescence : des agressions familiales dont on parle peu », <cite>Population &amp; Sociétés</cite> n° 612, Ined, juin 2023. <a href="https://www.ined.fr/fr/publications/editions/population-et-societes/violences-sexuelles-durant-enfance-et-adolescence" target="_blank" rel="noopener">Lire la publication<span class="visually-hidden"> (s’ouvre dans un nouvel onglet)</span></a>.</p>
+      <noscript><p class="about__noscript">L’illustration interactive nécessite JavaScript. Tout le texte de la scène reste lisible ci-dessus.</p></noscript>
+    </section>
+  </main>
+
+  <nav class="stepper" aria-label="Navigation dans la scène">
+    <button type="button" class="btn btn--ghost" id="prev-step" aria-controls="contenu">
+      <span aria-hidden="true">←</span> <span class="stepper__label">Précédent</span><span class="visually-hidden"> : étape précédente</span>
+    </button>
+    <p class="stepper__status" id="step-status" aria-live="polite">Étape 1 sur 3</p>
+    <button type="button" class="btn btn--ghost" id="next-step" aria-controls="contenu">
+      <span class="stepper__label">Suivant</span><span class="visually-hidden"> : étape suivante</span> <span aria-hidden="true">→</span>
+    </button>
+  </nav>
+
+  <dialog class="panel" id="panel" aria-labelledby="panel-title">
+    <div class="panel__inner">
+      <header class="panel__header">
+        <h2 class="panel__title" id="panel-title">Comprendre ce chiffre</h2>
+        <button type="button" class="panel__close" id="panel-close-x" aria-label="Fermer les explications">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        </button>
+      </header>
+      <div class="panel__body" id="panel-body">
+        <!-- Rempli depuis js/data.js -->
+      </div>
+      <footer class="panel__footer">
+        <button type="button" class="btn btn--primary" id="panel-close">Revenir à la classe</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/classroom.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
