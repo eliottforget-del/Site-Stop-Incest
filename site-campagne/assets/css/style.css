@@ -103,16 +103,26 @@ img { max-width: 100%; }
 .bande--soleil { --fond: #fdfce9; --ton: var(--accent); }
 
 /* Le carreau du cahier, sur papier blanc. Les bords déchirés héritent du fond,
-   motif compris, donc la déchirure emporte les lignes avec elle. */
-.bande--seyes {
-  --fond: var(--blanc);
+   motif compris, donc la déchirure emporte les lignes avec elle.
+   Le quadrillage est calé sur la fenêtre et non sur la section : il reste
+   immobile pendant que les cartes, les fiches et le pied de page passent
+   par-dessus. Les bords déchirés héritent de ce calage, donc leurs lignes
+   prolongent exactement celles de la feuille. */
+.bande--seyes { --fond: var(--blanc); }
+.bande--seyes, .seyes {
   --seyes: #dde5f2; --seyes-fort: #afc3e2; --pas-seyes: 38px;
   background-color: var(--blanc);
   background-image:
     repeating-linear-gradient(to bottom, transparent 0 calc(var(--pas-seyes) - 1.5px), var(--seyes-fort) calc(var(--pas-seyes) - 1.5px) var(--pas-seyes)),
     repeating-linear-gradient(to bottom, transparent 0 calc(var(--pas-seyes) / 4 - 1px), var(--seyes) calc(var(--pas-seyes) / 4 - 1px) calc(var(--pas-seyes) / 4)),
     repeating-linear-gradient(to right,  transparent 0 calc(var(--pas-seyes) - 1px), var(--seyes) calc(var(--pas-seyes) - 1px) var(--pas-seyes));
+  background-attachment: fixed;
 }
+/* La scène collée porte le même fond. Sur ordinateur et Android, les deux sont
+   calés sur la fenêtre et se superposent au pixel près. Sur iOS, qui ignore
+   « fixed », c'est elle qui garde les lignes immobiles pendant le défilement
+   des cartes. */
+.bande--seyes .defile__piste { background: inherit; }
 
 .ton--ciel    { --ton: var(--ciel); }
 .ton--herbe   { --ton: var(--herbe); }
@@ -196,33 +206,50 @@ img { max-width: 100%; }
 .nav__bouton { display: none; }
 
 /* ---------- Pied ---------- */
-.pied { position: relative; margin-top: var(--espace-9); padding-block: var(--espace-9) var(--espace-6); background: var(--herbe-fonce); color: var(--blanc); }
+/* Le pied est une feuille de cahier, comme les cartes : quadrillage Seyès
+   fixe (classe « seyes »), texte au crayon, traits de feutre verts. */
+.pied { position: relative; margin-top: var(--espace-9); padding-block: var(--espace-9) var(--espace-6); color: var(--crayon); --ton: var(--herbe); }
 .pied::before {
   content: ""; position: absolute; left: -1px; right: -1px; bottom: calc(100% - 1px);
-  height: var(--dechirure); background: var(--herbe-fonce);
+  height: var(--dechirure); background: inherit;
   -webkit-mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
   mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
 }
-.pied__grille { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--espace-8); align-items: start; }
-.pied__logo { width: 180px; margin-bottom: var(--espace-4); filter: brightness(0) invert(1); }
+/* Les colonnes de liens prennent la largeur de leur plus long lien : aucun
+   ne passe à la ligne, et chaque trait reste à la longueur de son mot. */
+.pied__grille { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto; gap: var(--espace-8); align-items: start; }
+.pied__logo { width: 180px; margin-bottom: var(--espace-4); }
 .pied h2 { font-family: var(--f-titre); font-weight: 400; font-size: 26px; margin: 0 0 var(--espace-4); }
 .pied ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espace-3); }
 /* Les liens cliquables portent le même trait de feutre que le menu, pas un
-   soulignement typographique. */
+   soulignement typographique.
+   Le trait est un pseudo-élément masqué, peint au ton de la section : il garde
+   toujours sa hauteur (9 px) et sa distance au texte, quelle que soit la
+   police chargée. En fond d'élément en ligne, il se calait sur la boîte de
+   Borel — très haute sous la ligne de base — et se retrouvait coupé, loin du
+   mot. Bloc en ligne : un lien qui passe à la ligne garde un seul trait, sous
+   sa dernière ligne, au lieu de fragments déformés. */
 .pied a {
-  color: var(--blanc); text-decoration: none; padding-bottom: 0;
-  background-image: var(--trait-blanc); background-repeat: no-repeat;
-  background-position: left calc(100% + 3px); background-size: 100% 7px;
-  /* Un lien qui passe à la ligne garde son trait sous chaque fragment. */
-  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  position: relative; display: inline-block; max-width: 100%;
+  color: var(--crayon); text-decoration: none;
+  line-height: 1.45; padding-bottom: 9px;
+  transition: translate .18s ease;
 }
-.pied a:hover { background-image: var(--trait-blanc-2); }
+.pied a::after {
+  content: ""; position: absolute; left: -2px; right: -2px; bottom: 0; height: 9px;
+  background: var(--ton); pointer-events: none;
+  -webkit-mask: var(--trait-4) left center / 100% 100% no-repeat;
+  mask: var(--trait-4) left center / 100% 100% no-repeat;
+}
+/* Au survol, la main repasse le trait autrement, et le lien se soulève. */
+.pied a:hover { translate: 0 -2px; }
+.pied a:hover::after { -webkit-mask-image: var(--trait-6); mask-image: var(--trait-6); }
 .pied p { margin: 0; }
 .pied__bas {
   margin-top: var(--espace-8); padding-top: var(--espace-5);
-  border-top: 1px solid rgba(255,255,255,.25);
+  border-top: 1px solid var(--seyes-fort, #afc3e2);
   display: flex; flex-wrap: wrap; gap: var(--espace-4); justify-content: space-between;
-  font-family: var(--f-note); font-size: 14px; color: rgba(255,255,255,.8);
+  font-family: var(--f-note); font-size: 14px; color: var(--encre);
 }
 
 /* ---------- Accessibilité ---------- */

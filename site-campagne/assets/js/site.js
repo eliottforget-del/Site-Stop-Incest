@@ -73,7 +73,14 @@
     var rail = defile.querySelector('.defile__rail');
     var course = 0;
     var mesure = function () {
-      course = Math.max(0, rail.scrollWidth - innerWidth);
+      // La dernière carte s'arrête aussi loin du bord droit que la première
+      // part du bord gauche. « scrollWidth » ne compte pas la marge de fin du
+      // rail : la dernière carte finissait collée au bord.
+      var elements = rail.children;
+      var premiere = elements[0], derniere = elements[elements.length - 1];
+      var marge = premiere.offsetLeft - rail.offsetLeft;
+      var fin = derniere.offsetLeft - rail.offsetLeft + derniere.offsetWidth + marge;
+      course = Math.max(0, fin - rail.clientWidth);
       defile.style.height = (innerHeight + course * 1.15) + 'px';
     };
     mesure();
@@ -91,13 +98,55 @@
   if (anatomie) {
     var carte3d = anatomie.querySelector('.carte3d');
     var plateau = anatomie.querySelector('.anatomie__plateau');
+    var socle = anatomie.querySelector('.carte3d__socle');
+    var reperes = Array.prototype.slice.call(plateau.querySelectorAll('.reperes li'));
+
+    /* Les filets verts partent de chaque repère et vont jusqu'au bord droit
+       de la carte. La carte est penchée : ce bord est oblique, donc chaque
+       filet a sa longueur. Pendant que la carte tourne, le bord se rapproche
+       du centre et les filets le suivent. */
+    var geo = null;
+    var mesureFilets = function () {
+      geo = null;
+      if (!reperes.length || getComputedStyle(reperes[0], '::before').display === 'none') {
+        reperes.forEach(function (li) { li.style.removeProperty('--filet'); });
+        return;
+      }
+      var p = plateau.getBoundingClientRect(), s = socle.getBoundingClientRect();
+      var angle = (parseFloat(getComputedStyle(socle).rotate) || 0) * Math.PI / 180;
+      geo = {
+        cx: s.left + s.width / 2, cy: s.top + s.height / 2,
+        demi: carte3d.offsetWidth / 2, cos: Math.cos(angle), tan: Math.tan(angle),
+        lignes: reperes.map(function (li) {
+          return {
+            el: li,
+            x: li.getBoundingClientRect().left,
+            y: p.top + p.height * parseFloat(li.style.getPropertyValue('--y')) / 100
+          };
+        })
+      };
+    };
+    var traceFilets = function (tour) {
+      if (!geo) return;
+      var a = geo.demi * Math.abs(Math.cos(tour * Math.PI / 180));
+      geo.lignes.forEach(function (l) {
+        // Bord droit d'un rectangle tourné de « angle », à la hauteur l.y.
+        var bord = geo.cx + a / geo.cos - geo.tan * (l.y - geo.cy);
+        l.el.style.setProperty('--filet', Math.max(0, l.x - bord + 2).toFixed(1) + 'px');
+      });
+    };
     if (sobre) {
       anatomie.classList.add('anatomie--statique');
       plateau.removeAttribute('data-face');
     } else {
       // La scène est fixée pendant toute la traversée ; la hauteur de la
       // section donne la course de la rotation.
-      var mesureAnat = function () { anatomie.style.height = (innerHeight * 2.4) + 'px'; };
+      var tourActuel = 0;
+      var mesureAnat = function () {
+        anatomie.style.height = (innerHeight * 2.4) + 'px';
+        mesureFilets();
+        traceFilets(tourActuel);
+      };
       mesureAnat();
       addEventListener('resize', mesureAnat, { passive: true });
       pistes.push({ el: anatomie, visible: false, maj: function () {
@@ -105,7 +154,9 @@
         var course = Math.max(1, anatomie.offsetHeight - innerHeight);
         var p = Math.min(1, Math.max(0, -r.top / course));
         var tour = p * 180;
+        tourActuel = tour;
         carte3d.style.setProperty('--tour', tour.toFixed(1) + 'deg');
+        traceFilets(tour);
         // Les repères changent au moment où la face bascule.
         plateau.setAttribute('data-face', tour < 90 ? 'recto' : 'verso');
       }});

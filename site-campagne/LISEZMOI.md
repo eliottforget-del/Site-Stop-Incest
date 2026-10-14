@@ -22,7 +22,7 @@ site-campagne/
 |---|---|---|---|
 | Encre | `#645f65` | 5,6:1 | texte secondaire, légendes, sources |
 | Accent | `#c42e88` | 5,2:1 | chiffres |
-| Herbe foncé | `#127a41` | 5,4:1 | fond du pied de page |
+| Herbe foncé | `#24763a` | 5,6:1 | réserve (ancien fond du pied de page) |
 | Accent 2 | `#db3e5f` | 4,0:1 | fonds pleins et traits, pas de petit texte |
 | Ciel | `#0db3da` | 2,2:1 | trait et fond dilué seulement |
 | Herbe | `#19a659` | 2,8:1 | trait et fond dilué seulement |
@@ -33,10 +33,10 @@ servent qu'au trait, à la tache et aux fonds dilués — c'est pourquoi les ban
 sont des versions très claires de la charte et non la couleur pure.
 
 Une section, un ton : les cartes en ciel, l'anatomie en herbe, l'ampleur en
-accent, le 119 en accent 2, le pied en herbe foncé.
+accent, le 119 en accent 2, le pied sur papier Seyès avec des traits verts.
 
-L'herbe de la charte ne donne que 3,2:1 avec du texte blanc. Pour le pied,
-elle est donc assombrie jusqu'à 5,4:1 — c'est le même vert, un cran plus bas.
+Le pied de page porte désormais du texte au crayon sur le quadrillage Seyès :
+le vert n'y sert plus qu'au trait sous les liens, jamais au texte.
 
 ## Ce qui vient de Terre Fragile
 
@@ -56,9 +56,17 @@ cartes, vos personnages détourés, votre illustration du 119, vos deux
 photographies de mise en situation, et les signes dessinés de vos planches —
 taches de couleur, flèches, cadres — qui servent de ponctuation.
 
-**Le quadrillage Seyès n'apparaît qu'à un seul endroit** : derrière la carte
-retournée, dans la section « Une carte, recto verso ». Là, il a une raison
-d'être — c'est le fond réel des cartes, et on en parle à cet instant précis.
+**Le quadrillage Seyès** — le fond réel des cartes — couvre les deux sections
+qui défilent (les neuf cartes, l'ampleur) et le pied de page. Il est **calé
+sur la fenêtre** (`background-attachment: fixed`) : les lignes ne bougent
+jamais, seuls les cartes, les fiches et le texte passent par-dessus. Sur iOS,
+qui ignore ce réglage, la scène collée porte le même fond et garde les lignes
+immobiles pendant le défilement des cartes.
+
+**Noms de fichiers accentués** : ils sont enregistrés en Unicode composé (NFC).
+Une archive faite sur Mac les stocke décomposés (NFD) : sur un serveur Linux,
+`Père.jpg` ou `Grand-mère.jpg` répondent alors 404. À vérifier à chaque
+nouvel envoi d'images.
 
 ## Les trois mécaniques
 

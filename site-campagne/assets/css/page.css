@@ -93,8 +93,11 @@ body[data-survol] .curseur__noyau { width: 0; height: 0; }
 .reperes li:nth-child(even) .reperes__num { rotate: 4deg; }
 .reperes h3 { margin: 0; }
 /* Un filet relie le repère à la carte, pour qu'on sache ce qu'il désigne. */
+/* Sa longueur, « --filet », est calculée par le script pour toucher le bord
+   droit de la carte ; sans script, il garde une longueur fixe. */
 .reperes li::before {
-  content: ""; position: absolute; right: 100%; width: clamp(18px, 4vw, 70px); height: 2px;
+  content: ""; position: absolute; right: 100%; top: calc(50% - 1px);
+  width: var(--filet, clamp(18px, 4vw, 70px)); height: 2px;
   background: var(--ton); opacity: .45;
 }
 
