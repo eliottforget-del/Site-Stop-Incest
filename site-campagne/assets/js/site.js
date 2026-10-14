@@ -110,8 +110,31 @@
       geo = null;
       if (!reperes.length || getComputedStyle(reperes[0], '::before').display === 'none') {
         reperes.forEach(function (li) { li.style.removeProperty('--filet'); });
+        plateau.style.removeProperty('--largeur-reperes');
+        plateau.style.removeProperty('--decalage');
         return;
       }
+      // La colonne des repères prend la largeur du plus long libellé, sur une
+      // ligne, pour que le bloc carte + repères soit vraiment centré. Si la
+      // place manque, elle se contente de ce qui reste et les libellés passent
+      // à la ligne.
+      plateau.classList.add('est-mesure');
+      var besoin = 0;
+      reperes.forEach(function (li) {
+        var num = li.firstElementChild, titre = li.lastElementChild;
+        var ecart = parseFloat(getComputedStyle(li).columnGap) || 0;
+        besoin = Math.max(besoin, num.offsetWidth + ecart + titre.scrollWidth);
+      });
+      plateau.classList.remove('est-mesure');
+      // Penchée de 10°, la carte déborde de sa case à gauche : on décale le
+      // bloc de la moitié de ce débordement pour que les marges visibles,
+      // et non celles des cases, soient égales.
+      var debord = Math.max(0, (socle.getBoundingClientRect().width - socle.offsetWidth) / 2);
+      plateau.style.setProperty('--decalage', debord.toFixed(1) + 'px');
+      var cs = getComputedStyle(plateau.parentElement);
+      var interieur = plateau.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var dispo = interieur - debord - socle.offsetWidth - (parseFloat(getComputedStyle(plateau).columnGap) || 0);
+      plateau.style.setProperty('--largeur-reperes', Math.max(0, Math.min(besoin + 4, dispo)) + 'px');
       var p = plateau.getBoundingClientRect(), s = socle.getBoundingClientRect();
       var angle = (parseFloat(getComputedStyle(socle).rotate) || 0) * Math.PI / 180;
       geo = {
@@ -149,6 +172,8 @@
       };
       mesureAnat();
       addEventListener('resize', mesureAnat, { passive: true });
+      // Les libellés changent de largeur quand Beth Ellen arrive.
+      if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(mesureAnat);
       pistes.push({ el: anatomie, visible: false, maj: function () {
         var r = anatomie.getBoundingClientRect();
         var course = Math.max(1, anatomie.offsetHeight - innerHeight);

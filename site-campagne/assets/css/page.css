@@ -62,7 +62,14 @@ body[data-survol] .curseur__noyau { width: 0; height: 0; }
 .anatomie__scene > .conteneur { width: 100%; }
 .anatomie__scene h2 { margin-bottom: clamp(44px, 9vh, 110px); }
 
-.anatomie__plateau { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(36px, 6vw, 110px); align-items: center; }
+/* La carte et ses repères forment un bloc centré sous le titre : deux
+   colonnes à leur juste largeur, au lieu d'une colonne de repères étirée
+   jusqu'au bord droit. */
+.anatomie__plateau {
+  position: relative; display: grid; align-items: center; justify-content: center;
+  grid-template-columns: auto var(--largeur-reperes, 22rem); gap: clamp(36px, 6vw, 110px);
+  padding-left: var(--decalage, 0px);
+}
 .carte3d__socle { rotate: -10deg; transform-style: preserve-3d; }
 .carte3d {
   position: relative; height: min(54svh, 500px); aspect-ratio: 537 / 877;
@@ -79,7 +86,9 @@ body[data-survol] .curseur__noyau { width: 0; height: 0; }
 .carte3d__tranche--d { right: 0; transform: rotateY(90deg);  transform-origin: right center; }
 
 /* Les repères : chacun à la hauteur de la zone qu'il désigne. */
-.reperes { position: absolute; inset: 0 0 0 auto; width: 58%; margin: 0; padding: 0; list-style: none; }
+/* Les deux listes occupent la même case, à hauteur de la carte : chaque
+   repère y est placé à la hauteur de la zone qu'il désigne. */
+.reperes { position: relative; grid-row: 1; grid-column: 2; align-self: stretch; margin: 0; padding: 0; list-style: none; }
 .reperes li {
   position: absolute; left: 0; right: 0; top: var(--y); translate: 0 -50%;
   display: grid; grid-template-columns: 46px 1fr; gap: var(--espace-4); align-items: center;
@@ -92,6 +101,7 @@ body[data-survol] .curseur__noyau { width: 0; height: 0; }
 }
 .reperes li:nth-child(even) .reperes__num { rotate: 4deg; }
 .reperes h3 { margin: 0; }
+.est-mesure .reperes h3 { white-space: nowrap; }
 /* Un filet relie le repère à la carte, pour qu'on sache ce qu'il désigne. */
 /* Sa longueur, « --filet », est calculée par le script pour toucher le bord
    droit de la carte ; sans script, il garde une longueur fixe. */
@@ -111,6 +121,9 @@ body[data-survol] .curseur__noyau { width: 0; height: 0; }
 html:not(.js) .reperes, .anatomie--statique .reperes { position: static; width: auto; display: grid; gap: var(--espace-5); opacity: 1 !important; translate: none !important; }
 html:not(.js) .reperes li, .anatomie--statique .reperes li { position: static; translate: none; }
 html:not(.js) .reperes li::before, .anatomie--statique .reperes li::before { display: none; }
+/* Sans rotation, recto et verso se lisent l'un sous l'autre, à côté de la carte. */
+html:not(.js) .reperes--verso, .anatomie--statique .reperes--verso { grid-row: 2; }
+html:not(.js) .carte3d__socle, .anatomie--statique .carte3d__socle { grid-row: 1 / span 2; }
 .anatomie--statique .anatomie__scene { position: static; height: auto; padding-block: var(--espace-8); }
 .anatomie--statique .anatomie__plateau { align-items: start; }
 
@@ -172,8 +185,7 @@ html:not(.js) .reperes li::before, .anatomie--statique .reperes li::before { dis
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {
   .urgence { grid-template-columns: 1fr; }
-  .anatomie__plateau { grid-template-columns: auto minmax(0, 1fr); gap: var(--espace-5); }
-  .reperes { width: 62%; }
+  .anatomie__plateau { gap: var(--espace-6); --largeur-reperes: 15.5rem; }
   .reperes li { grid-template-columns: 38px 1fr; gap: var(--espace-3); }
   .reperes__num { width: 38px; height: 38px; font-size: 17px; }
   .reperes h3 { font-size: 17px; }
@@ -185,6 +197,7 @@ html:not(.js) .reperes li::before, .anatomie--statique .reperes li::before { dis
   .anatomie__plateau { grid-template-columns: 1fr; justify-items: center; gap: var(--espace-5); }
   .anatomie__scene h2 { margin-bottom: var(--espace-4); }
   .carte3d { height: min(38svh, 310px); }
+  .anatomie__plateau > * { grid-row: auto !important; grid-column: auto !important; }
   .reperes { position: static; width: 100%; max-width: 420px; display: grid; gap: var(--espace-3); }
   .reperes li { position: static; translate: none; }
   .reperes li::before { display: none; }

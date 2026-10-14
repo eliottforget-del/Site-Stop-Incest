@@ -44,6 +44,7 @@
   --largeur-page: 1240px;
   --largeur-texte: 62ch;
   --dechirure: 26px;
+  --ombre-dechirure: drop-shadow(0 0 1px rgba(26, 26, 26, .14)) drop-shadow(0 3px 5px rgba(26, 26, 26, .12));
   --rayon-main: 16px 7px 18px 8px / 8px 18px 7px 16px;
   --rayon-bouton: 255px 18px 225px 18px / 18px 225px 18px 255px;
 
@@ -86,6 +87,11 @@ img { max-width: 100%; }
    Le ruban de couleur ne s'arrête pas net : le papier se déchire, comme une
    page arrachée d'un cahier. */
 .bande { position: relative; background: var(--fond); color: var(--crayon); margin-block: var(--dechirure); }
+/* Ombre portée des bords déchirés. Un masque découpe aussi l'ombre de
+   l'élément qu'il masque : elle est donc posée sur le parent, qui ombre la
+   silhouette complète — rectangle et déchirures. Sans elle, une feuille
+   blanche quadrillée posée sur du papier ne laisse pas voir son bord. */
+.bande, .entete, .pied { filter: var(--ombre-dechirure); }
 .bande::before, .bande::after {
   content: ""; position: absolute; left: -1px; right: -1px;
   height: var(--dechirure); background: inherit; pointer-events: none;
@@ -110,7 +116,9 @@ img { max-width: 100%; }
    prolongent exactement celles de la feuille. */
 .bande--seyes { --fond: var(--blanc); }
 .bande--seyes, .seyes {
-  --seyes: #dde5f2; --seyes-fort: #afc3e2; --pas-seyes: 38px;
+  /* Lignes adoucies d'environ un tiers vers le blanc : le quadrillage se
+     devine sans concurrencer le texte. (Avant : #dde5f2 et #afc3e2.) */
+  --seyes: #e9eef7; --seyes-fort: #cbd8ec; --pas-seyes: 38px;
   background-color: var(--blanc);
   background-image:
     repeating-linear-gradient(to bottom, transparent 0 calc(var(--pas-seyes) - 1.5px), var(--seyes-fort) calc(var(--pas-seyes) - 1.5px) var(--pas-seyes)),
@@ -247,7 +255,7 @@ img { max-width: 100%; }
 .pied p { margin: 0; }
 .pied__bas {
   margin-top: var(--espace-8); padding-top: var(--espace-5);
-  border-top: 1px solid var(--seyes-fort, #afc3e2);
+  border-top: 1px solid var(--seyes-fort, #cbd8ec);
   display: flex; flex-wrap: wrap; gap: var(--espace-4); justify-content: space-between;
   font-family: var(--f-note); font-size: 14px; color: var(--encre);
 }

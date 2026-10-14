@@ -61,7 +61,14 @@ qui défilent (les neuf cartes, l'ampleur) et le pied de page. Il est **calé
 sur la fenêtre** (`background-attachment: fixed`) : les lignes ne bougent
 jamais, seuls les cartes, les fiches et le texte passent par-dessus. Sur iOS,
 qui ignore ce réglage, la scène collée porte le même fond et garde les lignes
-immobiles pendant le défilement des cartes.
+immobiles pendant le défilement des cartes. Ses lignes sont volontairement
+pâles (`#e9eef7` et `#cbd8ec`) pour ne pas concurrencer le texte.
+
+**Les bords déchirés portent une ombre** (`--ombre-dechirure`) : sur une feuille
+quadrillée posée sur du papier, le bord ne se verrait pas sans elle. Elle est
+posée par `filter: drop-shadow` sur la section, l'en-tête et le pied, et non
+sur la déchirure elle-même, car le masque de la déchirure découperait aussi
+son ombre.
 
 **Noms de fichiers accentués** : ils sont enregistrés en Unicode composé (NFC).
 Une archive faite sur Mac les stocke décomposés (NFD) : sur un serveur Linux,
