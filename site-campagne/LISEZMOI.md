@@ -64,11 +64,14 @@ qui ignore ce réglage, la scène collée porte le même fond et garde les ligne
 immobiles pendant le défilement des cartes. Ses lignes sont volontairement
 pâles (`#e9eef7` et `#cbd8ec`) pour ne pas concurrencer le texte.
 
-**Les bords déchirés portent une ombre** (`--ombre-dechirure`) : sur une feuille
-quadrillée posée sur du papier, le bord ne se verrait pas sans elle. Elle est
-posée par `filter: drop-shadow` sur la section, l'en-tête et le pied, et non
-sur la déchirure elle-même, car le masque de la déchirure découperait aussi
-son ombre.
+**Le Seyès est toujours la couche du dessous.** Il n'a pas de bord déchiré à
+lui et ne porte jamais d'ombre : ce sont les feuilles blanches posées dessus
+— l'en-tête, l'anatomie, le 119 (classe `feuille`) — qui le recouvrent de leur
+bord déchiré et y projettent leur ombre (`--ombre-dechirure`). Seule
+exception : sous la photo d'ouverture, c'est le cahier qui mord l'image, sans
+ombre. L'ombre est posée par `filter: drop-shadow` sur la section entière,
+rendue opaque, et non sur la déchirure : le masque de la déchirure
+découperait aussi sa propre ombre.
 
 **Noms de fichiers accentués** : ils sont enregistrés en Unicode composé (NFC).
 Une archive faite sur Mac les stocke décomposés (NFD) : sur un serveur Linux,

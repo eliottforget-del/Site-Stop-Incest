@@ -153,6 +153,8 @@ html:not(.js) .carte3d__socle, .anatomie--statique .carte3d__socle { grid-row: 1
 .fiche:nth-child(3n)::before { scale: 1 -1; }
 .fiche .t-chiffre { font-family: var(--f-titre); color: var(--accent); line-height: 1.08; font-size: clamp(30px, 3.4vw, 50px); text-wrap: balance; }
 .fiche p { margin: var(--espace-3) 0 0; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.8; }
+/* Le titre de la fiche respire : un vrai blanc le sépare de son texte. */
+.fiche .t-chiffre + p { margin-top: var(--espace-5); }
 .fiche__source { display: block; margin-top: var(--espace-4); font-family: var(--f-note); font-size: 12px; line-height: 1.5; color: var(--mine); font-style: italic; }
 .ampleur__pied { margin-top: var(--espace-7); max-width: 52ch; }
 
@@ -168,8 +170,9 @@ html:not(.js) .carte3d__socle, .anatomie--statique .carte3d__socle { grid-row: 1
   width: 100%; max-width: 520px; justify-self: center;
   transition: rotate .25s ease, scale .25s ease;
 }
-/* Le combiné sonne quand la main passe dessus. */
-.urgence__illu:hover { animation: sonne .55s ease-in-out; scale: 1.04; }
+/* Le combiné sonne quand la main passe dessus — et, une fois, chaque fois
+   que la section arrive à l'écran (classe posée par le script). */
+.urgence__illu:hover, .urgence__illu.sonne { animation: sonne .55s ease-in-out; scale: 1.04; }
 @keyframes sonne {
   0%, 100% { rotate: 0deg; }
   18% { rotate: -5deg; }

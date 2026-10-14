@@ -63,6 +63,19 @@
     });
   }
 
+  /* ---------- Le 119 sonne à l'arrivée ----------
+     Même animation qu'au survol, jouée une fois quand le téléphone entre
+     franchement à l'écran ; elle pourra rejouer après qu'on l'a quitté. */
+  var telephone = doc.querySelector('.urgence__illu');
+  if (telephone && !sobre) {
+    telephone.addEventListener('animationend', function () { telephone.classList.remove('sonne'); });
+    new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) {
+        if (e.isIntersecting) telephone.classList.add('sonne');
+      });
+    }, { threshold: .6 }).observe(telephone);
+  }
+
   /* ---------- Sections liées au défilement ----------
      Un seul écouteur, calé sur l'image suivante, et qui ne calcule que pour
      les sections réellement à l'écran. */

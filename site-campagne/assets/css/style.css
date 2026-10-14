@@ -87,11 +87,6 @@ img { max-width: 100%; }
    Le ruban de couleur ne s'arrête pas net : le papier se déchire, comme une
    page arrachée d'un cahier. */
 .bande { position: relative; background: var(--fond); color: var(--crayon); margin-block: var(--dechirure); }
-/* Ombre portée des bords déchirés. Un masque découpe aussi l'ombre de
-   l'élément qu'il masque : elle est donc posée sur le parent, qui ombre la
-   silhouette complète — rectangle et déchirures. Sans elle, une feuille
-   blanche quadrillée posée sur du papier ne laisse pas voir son bord. */
-.bande, .entete, .pied { filter: var(--ombre-dechirure); }
 .bande::before, .bande::after {
   content: ""; position: absolute; left: -1px; right: -1px;
   height: var(--dechirure); background: inherit; pointer-events: none;
@@ -126,6 +121,32 @@ img { max-width: 100%; }
     repeating-linear-gradient(to right,  transparent 0 calc(var(--pas-seyes) - 1px), var(--seyes) calc(var(--pas-seyes) - 1px) var(--pas-seyes));
   background-attachment: fixed;
 }
+/* Le Seyès est toujours la couche du dessous : il n'a pas de bord déchiré à
+   lui et ne porte jamais d'ombre. Ce sont les feuilles blanches posées dessus
+   (« .feuille », plus bas) qui se déchirent et projettent leur ombre sur les
+   lignes. Seule exception : sous la photo d'ouverture, le cahier mord l'image
+   — sans ombre. */
+.bande--seyes { margin-block: 0; }
+.bande--seyes::before, .bande--seyes::after { display: none; }
+.hero + .bande--seyes::before { display: block; }
+
+/* ---------- Feuilles blanches posées sur le cahier ----------
+   Une section de papier qui touche le Seyès le recouvre par ses bords
+   déchirés, haut et bas, et y projette son ombre. Un masque découperait aussi
+   l'ombre de ce qu'il masque : l'ombre est donc posée sur la section, qui
+   ombre sa silhouette complète — rectangle et déchirures. La section doit
+   être opaque pour que seul ce contour porte une ombre, et passer au-dessus
+   des sections voisines. */
+.feuille { position: relative; z-index: 2; background: var(--papier); filter: var(--ombre-dechirure); }
+.feuille::before, .feuille::after {
+  content: ""; position: absolute; left: -1px; right: -1px;
+  height: var(--dechirure); background: inherit; pointer-events: none;
+}
+.feuille::before { bottom: calc(100% - 1px); -webkit-mask: var(--dechirure-haut-3) center bottom / 100% 100% no-repeat; mask: var(--dechirure-haut-3) center bottom / 100% 100% no-repeat; }
+.feuille::after  { top: calc(100% - 1px);    -webkit-mask: var(--dechirure-bas-3) center top / 100% 100% no-repeat;    mask: var(--dechirure-bas-3) center top / 100% 100% no-repeat; }
+.feuille--2::before { -webkit-mask-image: var(--dechirure-haut-4); mask-image: var(--dechirure-haut-4); }
+.feuille--2::after  { -webkit-mask-image: var(--dechirure-bas-4);  mask-image: var(--dechirure-bas-4); }
+
 /* La scène collée porte le même fond. Sur ordinateur et Android, les deux sont
    calés sur la fenêtre et se superposent au pixel près. Sur iOS, qui ignore
    « fixed », c'est elle qui garde les lignes immobiles pendant le défilement
@@ -180,6 +201,9 @@ img { max-width: 100%; }
 }
 /* La barre garde sa taille au défilement : une hauteur qui change sous l'œil
    fait sauter la page. Son bord bas est déchiré, et mord sur ce qui suit. */
+/* Blanche, elle passe au-dessus de tout, Seyès compris : elle porte donc
+   l'ombre de sa déchirure (posée sur elle, le masque découperait l'ombre). */
+.entete { filter: var(--ombre-dechirure); }
 .entete::after {
   content: ""; position: absolute; left: -1px; right: -1px; top: calc(100% - 1px);
   height: var(--dechirure); background: inherit; pointer-events: none;
@@ -216,13 +240,9 @@ img { max-width: 100%; }
 /* ---------- Pied ---------- */
 /* Le pied est une feuille de cahier, comme les cartes : quadrillage Seyès
    fixe (classe « seyes »), texte au crayon, traits de feutre verts. */
-.pied { position: relative; margin-top: var(--espace-9); padding-block: var(--espace-9) var(--espace-6); color: var(--crayon); --ton: var(--herbe); }
-.pied::before {
-  content: ""; position: absolute; left: -1px; right: -1px; bottom: calc(100% - 1px);
-  height: var(--dechirure); background: inherit;
-  -webkit-mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
-  mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
-}
+/* Il commence au ras de la section précédente : c'est elle, feuille blanche,
+   qui le recouvre de son bord déchiré. */
+.pied { position: relative; padding-block: var(--espace-9) var(--espace-6); color: var(--crayon); --ton: var(--herbe); }
 /* Les colonnes de liens prennent la largeur de leur plus long lien : aucun
    ne passe à la ligne, et chaque trait reste à la longueur de son mot. */
 .pied__grille { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto; gap: var(--espace-8); align-items: start; }
