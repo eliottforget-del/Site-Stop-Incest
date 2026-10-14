@@ -1,0 +1,259 @@
+/* ============================================================================
+   Stop Inceste — socle
+   Mécaniques empruntées au design system Terre Fragile : bandes à bords
+   déchirés, bouton tracé à main levée, angles irréguliers, pied de page en
+   bande pleine. Matières et couleurs : celles de la campagne.
+   Charger après traces.css.
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital@0;1&family=Beth+Ellen&family=Borel&display=swap");
+
+:root {
+  --papier: #fffdfa;
+  --blanc: #ffffff;
+  --crayon: #1a1a1a;
+
+  /* ---------- La charte ----------
+     Mesures de contraste sur papier blanc, en rapport :
+       encre   #645f65  5,6:1  → texte secondaire, légendes
+       accent  #c42e88  5,2:1  → texte, chiffres, fonds pleins
+       accent2 #db3e5f  4,0:1  → fonds pleins et traits, pas de petit texte
+       ciel    #0db3da  2,2:1  ┐
+       herbe   #3ca854  3,0:1  ├ trait, tache et fond seulement
+       soleil  #f4ec4d  1,2:1  ┘
+     Seuls l'encre et l'accent portent du texte courant. */
+  --encre: #645f65;
+  --ciel: #0db3da;
+  /* Vert relevé sur l'herbe des cartes elles-mêmes (#3ca854), plutôt que sur
+     la planche de charte : c'est celui du feutre qui a servi aux dessins.
+     À 3,0:1 il ne porte pas de texte ; sa version foncée monte à 5,6:1 et
+     tient le pied de page. */
+  --herbe: #3ca854;
+  --herbe-fonce: #24763a;
+  --soleil: #f4ec4d;
+  --accent: #c42e88;
+  --accent-2: #db3e5f;
+  --mine: var(--encre);
+
+  --ton: var(--ciel);
+
+  --espace-1: 4px;  --espace-2: 8px;  --espace-3: 12px; --espace-4: 16px;
+  --espace-5: 24px; --espace-6: 32px; --espace-7: 48px; --espace-8: 72px;
+  --espace-9: 112px; --espace-10: 160px;
+
+  --trait: 2.5px;
+  --largeur-page: 1240px;
+  --largeur-texte: 62ch;
+  --dechirure: 26px;
+  --rayon-main: 16px 7px 18px 8px / 8px 18px 7px 16px;
+  --rayon-bouton: 255px 18px 225px 18px / 18px 225px 18px 255px;
+
+  --f-titre: "Beth Ellen", "Bradley Hand", cursive;
+  --f-corps: "Borel", "Beth Ellen", cursive;
+  --f-note:  "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --largeur-logo: clamp(96px, 9vw, 124px);
+}
+
+/* ---------- Échelle ---------- */
+.t-hero { font-family: var(--f-titre); font-size: clamp(38px, 6.4vw, 86px); line-height: 1.06; font-weight: 400; margin: 0; }
+.t-1    { font-family: var(--f-titre); font-size: clamp(30px, 4.4vw, 56px); line-height: 1.12; font-weight: 400; margin: 0; }
+.t-2    { font-family: var(--f-titre); font-size: clamp(24px, 3vw, 36px);   line-height: 1.18; font-weight: 400; margin: 0; }
+.t-3    { font-family: var(--f-titre); font-size: clamp(20px, 2.1vw, 26px); line-height: 1.25; font-weight: 400; margin: 0; }
+.t-chiffre { font-family: var(--f-corps); font-size: clamp(44px, 7vw, 92px); line-height: 1; font-weight: 400; margin: 0; }
+.t-corps   { font-family: var(--f-corps); font-size: clamp(16px, 1.35vw, 19px); line-height: 1.95; }
+.t-note    { font-family: var(--f-note);  font-size: 15px; line-height: 1.6; color: var(--mine); }
+.t-etiquette { font-family: var(--f-note); font-size: 13px; line-height: 1.6; letter-spacing: .18em;
+               text-transform: uppercase; color: var(--mine); margin: 0 0 var(--espace-3); }
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--papier); color: var(--crayon);
+  font-family: var(--f-corps); font-size: 18px; line-height: 1.95;
+  -webkit-font-smoothing: antialiased; overflow-x: clip;
+}
+img { max-width: 100%; }
+.conteneur { max-width: var(--largeur-page); margin-inline: auto; padding-inline: var(--espace-7); }
+.section { position: relative; padding-block: var(--espace-10); }
+.prose { max-width: var(--largeur-texte); }
+.prose p { margin: 0 0 var(--espace-5); }
+.prose p:last-child { margin-bottom: 0; }
+.cache { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[hidden] { display: none !important; }
+
+/* ---------- Bandes à bords déchirés ----------
+   Le ruban de couleur ne s'arrête pas net : le papier se déchire, comme une
+   page arrachée d'un cahier. */
+.bande { position: relative; background: var(--fond); color: var(--crayon); margin-block: var(--dechirure); }
+.bande::before, .bande::after {
+  content: ""; position: absolute; left: -1px; right: -1px;
+  height: var(--dechirure); background: inherit; pointer-events: none;
+}
+.bande::before { bottom: calc(100% - 1px); -webkit-mask: var(--dechirure-haut-1) center bottom / 100% 100% no-repeat; mask: var(--dechirure-haut-1) center bottom / 100% 100% no-repeat; }
+.bande::after  { top: calc(100% - 1px);    -webkit-mask: var(--dechirure-bas-1) center top / 100% 100% no-repeat;    mask: var(--dechirure-bas-1) center top / 100% 100% no-repeat; }
+.bande--2::before { -webkit-mask-image: var(--dechirure-haut-2); mask-image: var(--dechirure-haut-2); }
+.bande--2::after  { -webkit-mask-image: var(--dechirure-bas-2);  mask-image: var(--dechirure-bas-2); }
+.bande--3::before { -webkit-mask-image: var(--dechirure-haut-3); mask-image: var(--dechirure-haut-3); }
+.bande--3::after  { -webkit-mask-image: var(--dechirure-bas-3);  mask-image: var(--dechirure-bas-3); }
+
+/* Les fonds de bande sont des dilutions de la charte : la couleur reste
+   reconnaissable sans jamais passer sous le texte. */
+.bande--herbe  { --fond: #eaf7f0; --ton: var(--herbe); }
+.bande--soleil { --fond: #fdfce9; --ton: var(--accent); }
+
+/* Le carreau du cahier, sur papier blanc. Les bords déchirés héritent du fond,
+   motif compris, donc la déchirure emporte les lignes avec elle. */
+.bande--seyes {
+  --fond: var(--blanc);
+  --seyes: #dde5f2; --seyes-fort: #afc3e2; --pas-seyes: 38px;
+  background-color: var(--blanc);
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--pas-seyes) - 1.5px), var(--seyes-fort) calc(var(--pas-seyes) - 1.5px) var(--pas-seyes)),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--pas-seyes) / 4 - 1px), var(--seyes) calc(var(--pas-seyes) / 4 - 1px) calc(var(--pas-seyes) / 4)),
+    repeating-linear-gradient(to right,  transparent 0 calc(var(--pas-seyes) - 1px), var(--seyes) calc(var(--pas-seyes) - 1px) var(--pas-seyes));
+}
+
+.ton--ciel    { --ton: var(--ciel); }
+.ton--herbe   { --ton: var(--herbe); }
+.ton--soleil  { --ton: var(--soleil); }
+.ton--accent  { --ton: var(--accent); }
+.ton--accent2 { --ton: var(--accent-2); }
+
+/* ---------- Titre souligné au feutre ---------- */
+.titre-trait { position: relative; display: inline-block; }
+.titre-trait::after {
+  content: ""; display: block; height: 18px; margin-top: var(--espace-1);
+  width: min(100%, 340px); background: var(--ton);
+  -webkit-mask: var(--trait-1) left bottom / var(--avancee, 100%) 18px no-repeat;
+  mask: var(--trait-1) left bottom / var(--avancee, 100%) 18px no-repeat;
+}
+.titre-trait--2::after { -webkit-mask-image: var(--trait-2); mask-image: var(--trait-2); }
+.titre-trait--3::after { -webkit-mask-image: var(--trait-3); mask-image: var(--trait-3); }
+.titre-trait--4::after { -webkit-mask-image: var(--trait-6); mask-image: var(--trait-6); }
+.titre-trait--blanc::after { background: var(--blanc); }
+
+/* ---------- Bouton ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--f-note); font-size: 16px; line-height: 1.2;
+  padding: 15px 28px 16px; color: var(--crayon); text-decoration: none;
+  border: var(--trait) solid var(--ton); border-radius: var(--rayon-bouton);
+  background: var(--blanc); rotate: -.7deg; cursor: pointer;
+  transition: rotate .18s ease, translate .18s ease, background .18s ease;
+}
+.btn:hover { rotate: .6deg; translate: 0 -3px; background: color-mix(in srgb, var(--ton) 12%, var(--blanc)); }
+.btn--plein { background: var(--ton); color: var(--blanc); border-color: var(--ton); }
+.btn--plein:hover { background: var(--ton); }
+.btn--blanc { background: var(--blanc); border-color: var(--blanc); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--espace-4); align-items: center; }
+
+/* ---------- Signes dessinés ----------
+   Taches, flèches, cadres : la ponctuation du cahier. Toujours décoratives,
+   jamais porteuses d'information. */
+.signe { position: absolute; pointer-events: none; user-select: none; z-index: 0; }
+.signe img { display: block; width: 100%; height: auto; }
+
+/* ---------- En-tête ---------- */
+.entete {
+  position: sticky; top: 0; z-index: 40; background: var(--blanc);
+  padding-block: var(--espace-3);
+  transition: padding .2s ease, box-shadow .2s ease;
+}
+/* La barre garde sa taille au défilement : une hauteur qui change sous l'œil
+   fait sauter la page. Son bord bas est déchiré, et mord sur ce qui suit. */
+.entete::after {
+  content: ""; position: absolute; left: -1px; right: -1px; top: calc(100% - 1px);
+  height: var(--dechirure); background: inherit; pointer-events: none;
+  -webkit-mask: var(--dechirure-bas-2) center top / 100% 100% no-repeat;
+  mask: var(--dechirure-bas-2) center top / 100% 100% no-repeat;
+}
+/* Le logotype est centré en absolu et la liste lui réserve sa place : il reste
+   donc dans la barre quand le volet s'ouvre, au lieu d'y tomber avec les liens. */
+.entete__inner { position: relative; display: flex; justify-content: center; align-items: center; }
+.entete__logo { position: absolute; left: 50%; translate: -50% 0; }
+.entete__logo img { display: block; width: var(--largeur-logo); height: auto; }
+/* Le logotype est centré sur la page. Pour que les écarts soient égaux de part
+   et d'autre, ce n'est pas le groupe de liens qu'il faut centrer mais le trou
+   qui l'accueille : les deux moitiés du menu reçoivent donc la même largeur,
+   quelle que soit la longueur de leurs mots. */
+/* Le menu occupe toute la largeur : sans espace libre à répartir, les deux
+   moitiés garderaient chacune la largeur de ses propres mots. */
+.nav { width: 100%; }
+.nav ul { list-style: none; margin: 0; padding: 0; }
+.nav__cote { min-width: 0; }
+.nav__rangee { display: flex; align-items: center; width: 100%; }
+.nav__cote { flex: 1 1 0; display: flex; }
+.nav__cote:first-child { justify-content: flex-end; }
+.nav__cote:last-child { justify-content: flex-start; }
+.nav__cote ul { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px); }
+.nav__place { flex: none; width: calc(var(--largeur-logo) + 2 * clamp(26px, 3vw, 52px)); }
+.nav a { font-family: var(--f-note); font-size: 16px; color: var(--crayon); text-decoration: none; padding-bottom: 7px; white-space: nowrap; }
+.nav a[aria-current], .nav a:hover {
+  background-image: var(--trait-4); background-repeat: no-repeat;
+  background-position: left bottom; background-size: 100% 10px;
+}
+.nav__bouton { display: none; }
+
+/* ---------- Pied ---------- */
+.pied { position: relative; margin-top: var(--espace-9); padding-block: var(--espace-9) var(--espace-6); background: var(--herbe-fonce); color: var(--blanc); }
+.pied::before {
+  content: ""; position: absolute; left: -1px; right: -1px; bottom: calc(100% - 1px);
+  height: var(--dechirure); background: var(--herbe-fonce);
+  -webkit-mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
+  mask: var(--dechirure-haut-4) center bottom / 100% 100% no-repeat;
+}
+.pied__grille { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--espace-8); align-items: start; }
+.pied__logo { width: 180px; margin-bottom: var(--espace-4); filter: brightness(0) invert(1); }
+.pied h2 { font-family: var(--f-titre); font-weight: 400; font-size: 26px; margin: 0 0 var(--espace-4); }
+.pied ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espace-3); }
+/* Les liens cliquables portent le même trait de feutre que le menu, pas un
+   soulignement typographique. */
+.pied a {
+  color: var(--blanc); text-decoration: none; padding-bottom: 0;
+  background-image: var(--trait-blanc); background-repeat: no-repeat;
+  background-position: left calc(100% + 3px); background-size: 100% 7px;
+  /* Un lien qui passe à la ligne garde son trait sous chaque fragment. */
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.pied a:hover { background-image: var(--trait-blanc-2); }
+.pied p { margin: 0; }
+.pied__bas {
+  margin-top: var(--espace-8); padding-top: var(--espace-5);
+  border-top: 1px solid rgba(255,255,255,.25);
+  display: flex; flex-wrap: wrap; gap: var(--espace-4); justify-content: space-between;
+  font-family: var(--f-note); font-size: 14px; color: rgba(255,255,255,.8);
+}
+
+/* ---------- Accessibilité ---------- */
+.evitement { position: absolute; left: -9999px; top: 10px; z-index: 60; background: var(--blanc);
+             border: var(--trait) solid var(--crayon); padding: 12px 20px; border-radius: var(--rayon-main); }
+.evitement:focus { left: 16px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 900px) {
+  /* Le logotype reste au centre de la barre ; les quatre entrées descendent
+     dans le volet. */
+  .entete__inner { justify-content: flex-start; }
+  .nav__rangee { display: none; }
+  .nav__cote { flex: none; width: 100%; }
+  .nav__cote ul { flex-direction: column; align-items: stretch; gap: var(--espace-3); width: 100%; }
+  .nav__place { display: none; }
+  .nav[data-ouvert] .nav__rangee {
+    display: flex; flex-direction: column; gap: var(--espace-3);
+    position: absolute; left: var(--espace-4); right: var(--espace-4); top: 100%;
+    padding: var(--espace-5); background: var(--blanc);
+    border: var(--trait) solid var(--crayon); border-radius: var(--rayon-main);
+  }
+  .nav__bouton { display: inline-flex; }
+  .pied__grille { grid-template-columns: 1fr; gap: var(--espace-6); }
+}
+@media (max-width: 640px) {
+  .conteneur { padding-inline: var(--espace-4); }
+  .section { padding-block: var(--espace-8); }
+  :root { --dechirure: 16px; }
+  /* Seul l'appel disparaît sous 640 px — viser « .btn » masquait aussi
+     le bouton Menu, qui est un bouton lui aussi. */
+  .entete__logo img { width: 104px; }
+}

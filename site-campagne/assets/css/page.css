@@ -1,0 +1,203 @@
+/* ============================================================================
+   Stop Inceste — mise en page
+   ========================================================================== */
+
+/* ---------- Curseur ---------- */
+.curseur, .curseur__noyau {
+  position: fixed; top: 0; left: 0; z-index: 90; pointer-events: none;
+  border-radius: 50%; translate: -50% -50%; opacity: 0;
+  transition: opacity .3s ease, width .25s ease, height .25s ease, background .25s ease;
+}
+.curseur { width: 38px; height: 38px; border: var(--trait) solid var(--ton); }
+.curseur__noyau { width: 7px; height: 7px; background: var(--ton); }
+body[data-pointeur] .curseur, body[data-pointeur] .curseur__noyau { opacity: 1; }
+body[data-survol] .curseur { width: 62px; height: 62px; background: color-mix(in srgb, var(--ton) 14%, transparent); }
+body[data-survol] .curseur__noyau { width: 0; height: 0; }
+
+/* ============================================================================
+   0. L'ouverture : la photographie du présentoir, pleine page
+   ========================================================================== */
+.hero { position: relative; width: 100vw; margin-left: calc(50% - 50vw); }
+.hero__photo { position: relative; display: block; margin: 0; }
+/* Pas de recadrage : l'image est montrée dans son format, et c'est sa hauteur
+   qui s'adapte. On la plafonne seulement pour qu'elle ne dépasse pas l'écran. */
+.hero__photo img {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 1912 / 1082; max-height: 94svh;
+  object-fit: cover; object-position: center center;
+}
+/* Aucune déchirure claire sous l'image : c'est la bande bleue qui vient mordre
+   dessus avec la sienne, sans blanc entre les deux. */
+.hero + .bande { margin-top: 0; }
+/* ============================================================================
+   1. Les neuf cartes qui défilent
+   La page s'ouvre dessus : pas d'image d'accroche, le jeu lui-même est
+   l'accroche. Le titre reste au-dessus, jamais par-dessus les cartes.
+   ========================================================================== */
+.defile { position: relative; }
+/* Colonne flexible, pas une grille : une piste de cartes plus large que
+   l'écran étirerait la colonne de la grille et déporterait le titre. */
+.defile__piste { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; overflow: hidden; }
+.defile__tete { flex: none; width: 100%; padding-top: clamp(96px, 13vh, 150px); }
+.defile__tete .t-1 { max-width: none; font-size: clamp(24px, 3.5vw, 48px); white-space: nowrap; }
+.defile__rail { flex: none; margin-block: auto; display: flex; align-items: center; gap: clamp(16px, 3vw, 46px); padding-inline: 10vw; will-change: transform; }
+.defile__carte { flex: 0 0 auto; width: clamp(160px, 20vw, 268px); margin: 0; }
+.defile__carte img { display: block; width: 100%; height: auto; border-radius: 10px;
+                     box-shadow: 0 2px 4px rgba(26,26,26,.12), 0 18px 40px rgba(26,26,26,.14); }
+.defile__carte:nth-child(odd)  { rotate: -1.4deg; }
+.defile__carte:nth-child(even) { rotate: 1.1deg; translate: 0 22px; }
+
+.defile--statique .defile__piste { position: static; height: auto; padding-bottom: var(--espace-9); }
+.defile--statique .defile__rail { flex-wrap: wrap; justify-content: center; padding-inline: 0; transform: none !important; }
+.defile--statique .defile__carte { width: clamp(140px, 19vw, 200px); }
+
+/* ============================================================================
+   2. Anatomie d'une carte
+   Toute la scène est fixée — titre compris — et seule la carte tourne. Les
+   repères ne défilent plus : trois pour le recto, trois pour le verso, qui se
+   remplacent au passage des 90°.
+   ========================================================================== */
+.anatomie { padding-block: 0; }
+.anatomie__scene { position: sticky; top: 0; height: 100svh; display: grid; align-content: center; perspective: 1600px; }
+.anatomie__scene > .conteneur { width: 100%; }
+.anatomie__scene h2 { margin-bottom: clamp(44px, 9vh, 110px); }
+
+.anatomie__plateau { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(36px, 6vw, 110px); align-items: center; }
+.carte3d__socle { rotate: -10deg; transform-style: preserve-3d; }
+.carte3d {
+  position: relative; height: min(54svh, 500px); aspect-ratio: 537 / 877;
+  transform-style: preserve-3d; transform: rotateY(var(--tour, 0deg));
+  filter: none;
+}
+.anatomie__scene { filter: drop-shadow(0 16px 30px rgba(26,26,26,.2)); }
+.carte3d__face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; overflow: hidden; }
+.carte3d__face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carte3d__face--recto { transform: translateZ(3px); }
+.carte3d__face--dos { transform: rotateY(180deg) translateZ(3px); }
+.carte3d__tranche { position: absolute; top: 2px; bottom: 2px; width: 6px; background: #efece6; }
+.carte3d__tranche--g { left: 0;  transform: rotateY(-90deg); transform-origin: left center; }
+.carte3d__tranche--d { right: 0; transform: rotateY(90deg);  transform-origin: right center; }
+
+/* Les repères : chacun à la hauteur de la zone qu'il désigne. */
+.reperes { position: absolute; inset: 0 0 0 auto; width: 58%; margin: 0; padding: 0; list-style: none; }
+.reperes li {
+  position: absolute; left: 0; right: 0; top: var(--y); translate: 0 -50%;
+  display: grid; grid-template-columns: 46px 1fr; gap: var(--espace-4); align-items: center;
+}
+.reperes__num {
+  display: grid; place-items: center; width: 46px; height: 46px;
+  font-family: var(--f-corps); font-size: 20px; color: var(--ton);
+  border: var(--trait) solid var(--ton);
+  border-radius: 58% 42% 51% 49% / 45% 56% 44% 55%; rotate: -5deg;
+}
+.reperes li:nth-child(even) .reperes__num { rotate: 4deg; }
+.reperes h3 { margin: 0; }
+/* Un filet relie le repère à la carte, pour qu'on sache ce qu'il désigne. */
+.reperes li::before {
+  content: ""; position: absolute; right: 100%; width: clamp(18px, 4vw, 70px); height: 2px;
+  background: var(--ton); opacity: .45;
+}
+
+/* Le passage d'une face à l'autre : les trois repères se remplacent. */
+.reperes { transition: opacity .3s ease, translate .3s ease; }
+.anatomie__plateau[data-face="recto"] .reperes--verso,
+.anatomie__plateau[data-face="verso"] .reperes--recto {
+  opacity: 0; translate: 0 14px; pointer-events: none;
+}
+/* Sans script, les six repères se lisent l'un sous l'autre. */
+html:not(.js) .reperes, .anatomie--statique .reperes { position: static; width: auto; display: grid; gap: var(--espace-5); opacity: 1 !important; translate: none !important; }
+html:not(.js) .reperes li, .anatomie--statique .reperes li { position: static; translate: none; }
+html:not(.js) .reperes li::before, .anatomie--statique .reperes li::before { display: none; }
+.anatomie--statique .anatomie__scene { position: static; height: auto; padding-block: var(--espace-8); }
+.anatomie--statique .anatomie__plateau { align-items: start; }
+
+/* ============================================================================
+   3. L'ampleur
+   Les fiches défilent de droite à gauche, et leur contenu est là dès l'arrivée :
+   rien n'attend d'être révélé. Chaque chiffre est porté par un dessin.
+   ========================================================================== */
+/* Une feuille arrachée, pas une carte à coins arrondis : le papier porte ses
+   propres bords, dessinés, et le bloc n'a donc ni fond ni ombre à lui. */
+.fiche {
+  position: relative; isolation: isolate;
+  flex: 0 0 auto; width: clamp(280px, 34vw, 430px);
+  padding: clamp(34px, 3.4vw, 54px) clamp(30px, 3vw, 46px);
+}
+.fiche::before {
+  content: ""; position: absolute; inset: -3% -2.5%; z-index: -1;
+  background: url("../img/feuille.svg") center / 100% 100% no-repeat;
+}
+/* Chaque fiche a sa propre déformation : un rectangle tracé à la main n'est
+   jamais deux fois le même. */
+/* Chaque feuille est posée de travers, et sa déchirure retournée une fois sur
+   deux pour qu'on ne reconnaisse pas le même bord. */
+.fiche:nth-child(odd)  { rotate: -.9deg; }
+.fiche:nth-child(even) { rotate: .7deg; translate: 0 22px; }
+.fiche:nth-child(even)::before { scale: -1 1; }
+.fiche:nth-child(3n)::before { scale: 1 -1; }
+.fiche .t-chiffre { font-family: var(--f-titre); color: var(--accent); line-height: 1.08; font-size: clamp(30px, 3.4vw, 50px); text-wrap: balance; }
+.fiche p { margin: var(--espace-3) 0 0; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.8; }
+.fiche__source { display: block; margin-top: var(--espace-4); font-family: var(--f-note); font-size: 12px; line-height: 1.5; color: var(--mine); font-style: italic; }
+.ampleur__pied { margin-top: var(--espace-7); max-width: 52ch; }
+
+/* ============================================================================
+   4. Le 119 — sur papier blanc
+   ========================================================================== */
+.urgence { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: clamp(28px, 4vw, 56px); align-items: center; }
+/* Deux lignes, pas trois. Mesuré : la phrase fait 1231 px d'un seul tenant
+   à 56 px de corps, pour une colonne de 557. Il faut donc descendre à 44 px
+   pour que la moitié tienne. */
+.urgence h2 { font-size: clamp(27px, 3.3vw, 44px); max-width: 100%; text-wrap: balance; }
+.urgence__illu {
+  width: 100%; max-width: 520px; justify-self: center;
+  transition: rotate .25s ease, scale .25s ease;
+}
+/* Le combiné sonne quand la main passe dessus. */
+.urgence__illu:hover { animation: sonne .55s ease-in-out; scale: 1.04; }
+@keyframes sonne {
+  0%, 100% { rotate: 0deg; }
+  18% { rotate: -5deg; }
+  38% { rotate: 4.5deg; }
+  58% { rotate: -3deg; }
+  78% { rotate: 2deg; }
+}
+.urgence__liste { list-style: none; margin: var(--espace-6) 0 0; padding: 0; display: grid; gap: var(--espace-3); font-family: var(--f-note); font-size: 16px; }
+.urgence__liste li { position: relative; padding-left: 32px; }
+.urgence__liste li::before { content: ""; position: absolute; left: 0; top: .45em; width: 16px; height: 10px; background: var(--accent-2);
+  -webkit-mask: var(--trait-5) center / contain no-repeat; mask: var(--trait-5) center / contain no-repeat; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .urgence { grid-template-columns: 1fr; }
+  .anatomie__plateau { grid-template-columns: auto minmax(0, 1fr); gap: var(--espace-5); }
+  .reperes { width: 62%; }
+  .reperes li { grid-template-columns: 38px 1fr; gap: var(--espace-3); }
+  .reperes__num { width: 38px; height: 38px; font-size: 17px; }
+  .reperes h3 { font-size: 17px; }
+  .carte3d { height: min(44svh, 380px); }
+}
+/* Sous 760 px il n'y a pas la place pour poser les repères à côté de la carte :
+   ils passent dessous, en liste, mais gardent le remplacement recto/verso. */
+@media (max-width: 760px) {
+  .anatomie__plateau { grid-template-columns: 1fr; justify-items: center; gap: var(--espace-5); }
+  .anatomie__scene h2 { margin-bottom: var(--espace-4); }
+  .carte3d { height: min(38svh, 310px); }
+  .reperes { position: static; width: 100%; max-width: 420px; display: grid; gap: var(--espace-3); }
+  .reperes li { position: static; translate: none; }
+  .reperes li::before { display: none; }
+  .anatomie__plateau[data-face="recto"] .reperes--verso,
+  .anatomie__plateau[data-face="verso"] .reperes--recto { display: none; }
+}
+@media (max-width: 640px) {
+  .defile__tete { padding-top: calc(var(--espace-8) + 16px); }
+  .defile__tete .t-1 { white-space: normal; }
+  /* Montrée entière sur un téléphone, l'image ne ferait que 212 px de haut :
+     elle ressemblerait à un bandeau. On recadre un peu pour lui rendre sa
+     présence, au prix d'environ un sixième des bords. */
+  .hero__photo img { aspect-ratio: 3 / 2; object-fit: cover; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .curseur, .curseur__noyau { display: none; }
+  * { transition: none !important; animation: none !important; }
+}
